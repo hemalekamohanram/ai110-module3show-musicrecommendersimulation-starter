@@ -10,19 +10,29 @@
 
 **What task did you give the agent?**
 
-<!-- Describe the goal you asked the agent to accomplish -->
+I asked the agent to extend my recommender with advanced song features, multiple scoring modes, a diversity penalty, and cleaner terminal output while keeping the code modular.
 
 **Prompts used:**
 
-<!-- Paste the key prompts you gave the agent -->
+- "Add 5+ advanced attributes to songs.csv (popularity, decade, detailed mood tags, instrumentalness, speechiness, language, explicit) and update loading/scoring logic."
+- "Create switchable scoring modes like genre-first, mood-first, and energy-focused using a simple modular design pattern."
+- "Implement a diversity rule: penalize songs if the artist already appears in selected top results."
+- "Format terminal output as a readable ASCII table including score reasons."
 
 **What did the agent generate or change?**
 
-<!-- List the files edited, code generated, or commands run -->
+- Edited `data/songs.csv` to add 7 new columns and values for all 18 songs.
+- Updated `src/recommender.py` to:
+	- parse the new features from CSV,
+	- add mode-specific scoring weights,
+	- score advanced features (popularity, decade, detailed mood, instrumentalness, speechiness, language, explicit preference),
+	- apply a diversity penalty for repeated artists/genres in top-k selection.
+- Updated `src/main.py` to run multiple profiles with multiple scoring modes and print a wider summary table with reasons.
+- Ran `python -m src.main` with the local Python executable to verify output.
 
 **What did you verify or fix manually?**
 
-<!-- Describe anything the agent got wrong or that required human review -->
+I manually verified the CSV schema and confirmed numeric conversions are valid (int/float/bool). I checked that each scoring mode changes ranking behavior and that diversity penalties appear in the explanation text. I also reviewed edge-case outputs to make sure the model was not crashing when preferences conflict.
 
 ---
 
@@ -32,12 +42,12 @@
 
 **Which design pattern did you use?**
 
-<!-- e.g., Strategy, Factory, Observer, etc. -->
+Strategy pattern (lightweight version).
 
 **How did AI help you brainstorm or implement it?**
 
-<!-- Describe the conversation or suggestions that led to your decision -->
+AI suggested separating scoring logic by mode so each strategy can have its own weight profile while reusing one ranking pipeline. That made it easy to switch from `genre_first` to `mood_first` or `energy_focused` without rewriting the full function.
 
 **How does the pattern appear in your final code?**
 
-<!-- Point to the relevant class or method -->
+In `src/recommender.py`, mode-specific behavior is encapsulated in `MODE_WEIGHTS` and selected through `_score_song_with_mode(...)`. `recommend_songs(...)` uses the chosen mode as a strategy input and then applies a shared ranking + diversity step.

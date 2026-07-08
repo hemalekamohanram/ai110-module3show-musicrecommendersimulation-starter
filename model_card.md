@@ -2,110 +2,74 @@
 
 ## 1. Model Name  
 
-Give your model a short, descriptive name.  
-Example: **VibeFinder 1.0**  
+MoodMatch Mini 1.0
 
 ---
 
 ## 2. Intended Use  
 
-Describe what your recommender is designed to do and who it is for. 
+Goal / Task: This model suggests songs from a small catalog based on a user taste profile. It predicts which songs feel closest to the user vibe.
 
-Prompts:  
+Intended use: classroom exploration and learning how recommendation logic works.
 
-- What kind of recommendations does it generate  
-- What assumptions does it make about the user  
-- Is this for real users or classroom exploration  
+Non-intended use: real production recommendations, mental health mood detection, or high-stakes user profiling.
 
 ---
 
 ## 3. How the Model Works  
 
-Explain your scoring approach in simple language.  
-
-Prompts:  
-
-- What features of each song are used (genre, energy, mood, etc.)  
-- What user preferences are considered  
-- How does the model turn those into a score  
-- What changes did you make from the starter logic  
-
-Avoid code here. Pretend you are explaining the idea to a friend who does not program.
+Algorithm summary: For each song, I give points for genre match and mood match. Then I add energy closeness points based on how near the song energy is to the user target. After scoring every song, I sort from highest to lowest and return top 5. This makes the model easy to explain, but also easy to bias if one feature weight is too strong.
 
 ---
 
 ## 4. Data  
 
-Describe the dataset the model uses.  
+Data used: 18 songs in songs.csv.
 
-Prompts:  
+Main features: genre, mood, energy, tempo_bpm, valence, danceability, acousticness.
 
-- How many songs are in the catalog  
-- What genres or moods are represented  
-- Did you add or remove data  
-- Are there parts of musical taste missing in the dataset  
+I expanded the starter data from 10 to 18 songs with more genres and moods.
+
+Limits: still a tiny catalog, only one row per song, and no lyrics, language, or listening history.
 
 ---
 
 ## 5. Strengths  
 
-Where does your system seem to work well  
-
-Prompts:  
-
-- User types for which it gives reasonable results  
-- Any patterns you think your scoring captures correctly  
-- Cases where the recommendations matched your intuition  
+The model works well when user intent is clear, like High-Energy Pop or Chill Lofi. Top results usually match expected vibe. The explanations are also useful because I can see exactly why a song ranked high.
 
 ---
 
 ## 6. Limitations and Bias 
 
-Where the system struggles or behaves unfairly. 
-
-Prompts:  
-
-- Features it does not consider  
-- Genres or moods that are underrepresented  
-- Cases where the system overfits to one preference  
-- Ways the scoring might unintentionally favor some users  
+One weakness I found is that the current scoring overweights energy closeness, which can create an "energy bubble" and ignore style intent. In my edge-case test (rock + intense + very low energy), the recommender mostly returned low-energy chill tracks instead of intense tracks, which felt unintuitive. This means users with conflicting preferences can get recommendations that match a single numeric feature but miss the overall vibe they likely want. The model also ignores important signals like lyrics, language, and context, so it can flatten different listening goals into similar outputs.
 
 ---
 
 ## 7. Evaluation  
 
-How you checked whether the recommender behaved as expected. 
+I tested four profiles: High-Energy Pop, Chill Lofi, Deep Intense Rock, and an edge case (rock + intense + very low energy). I looked at whether top songs matched the intended vibe, not just one feature.
 
-Prompts:  
+What surprised me: "Gym Hero" appeared for multiple profiles because it has very high energy, so the score can stay strong even when genre is not a perfect match. This showed me that energy can dominate results when weights are high.
 
-- Which user profiles you tested  
-- What you looked for in the recommendations  
-- What surprised you  
-- Any simple tests or comparisons you ran  
+High-Energy Pop vs Chill Lofi: Pop recommendations moved toward upbeat, high-energy tracks, while Chill Lofi moved toward softer, slower tracks like "Library Rain." This makes sense because both mood and energy targets changed.
 
-No need for numeric metrics unless you created some.
+Chill Lofi vs Deep Intense Rock: Chill Lofi favored calm tracks, while Deep Intense Rock pushed "Storm Runner" to the top because both genre and mood matched intense preferences.
+
+Deep Intense Rock vs Edge Case (intense + low energy): The edge case shifted away from intense rock toward low-energy songs. That change makes sense mathematically, but it also shows a weakness: the model can over-follow energy and miss overall style intent.
 
 ---
 
 ## 8. Future Work  
 
-Ideas for how you would improve the model next.  
+Ideas for improvement:
 
-Prompts:  
-
-- Additional features or preferences  
-- Better ways to explain recommendations  
-- Improving diversity among the top results  
-- Handling more complex user tastes  
+- Rebalance weights so energy does not dominate every profile.
+- Add a diversity rule so top 5 is not all same style.
+- Add secondary preferences (for example, second favorite genre or mood).
 
 ---
 
 ## 9. Personal Reflection  
 
-A few sentences about your experience.  
-
-Prompts:  
-
-- What you learned about recommender systems  
-- Something unexpected or interesting you discovered  
-- How this changed the way you think about music recommendation apps  
+My biggest learning moment was seeing how small weight changes can totally change outputs. A simple rule can feel smart, but it can also lock into one feature and miss the bigger vibe. AI tools helped me move faster on structure and debugging, but I still had to check logic with real test profiles because some suggestions looked good in theory but gave weird rankings. I was surprised that a basic scoring model still felt like a real recommender when the reasons were printed clearly. If I keep going, I want to add diversity controls and a second-layer rerank step so recommendations feel less repetitive.
